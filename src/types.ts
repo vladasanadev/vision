@@ -31,8 +31,12 @@ export interface PhysicsConfig {
   maxVelocity: number;
 }
 
+// Default card color
+export const DEFAULT_CARD_COLOR = '#E3E1D4';
+
 // Available card colors
 export const CARD_COLORS = [
+  { name: 'Sand', value: '#E3E1D4' },
   { name: 'Coral', value: '#FF6B6B' },
   { name: 'Teal', value: '#4ECDC4' },
   { name: 'Lavender', value: '#A78BFA' },
@@ -40,5 +44,4 @@ export const CARD_COLORS = [
   { name: 'Rose', value: '#F472B6' },
   { name: 'Sky', value: '#38BDF8' },
   { name: 'Lime', value: '#84CC16' },
-  { name: 'Slate', value: '#64748B' },
 ];

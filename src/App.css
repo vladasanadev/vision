@@ -184,19 +184,12 @@ body {
 .vision-card {
   position: absolute;
   width: 200px;
-  height: 110px;
-  padding: var(--space-md) var(--space-lg);
+  height: 200px;
   cursor: grab;
   z-index: 10;
   user-select: none;
-  border-radius: var(--radius-lg);
   transform-origin: center center;
   will-change: transform;
-  box-shadow: 
-    0 2px 8px rgba(0,0,0,0.06),
-    0 8px 24px rgba(0,0,0,0.08);
-  display: flex;
-  flex-direction: column;
 }
 
 .vision-card:active {
@@ -205,43 +198,78 @@ body {
 
 .vision-card.selected {
   z-index: 20;
-  box-shadow: 
-    0 4px 16px rgba(0,0,0,0.1),
-    0 12px 40px rgba(0,0,0,0.12),
-    0 0 0 3px rgba(255,255,255,0.9);
 }
 
-.card-shine {
+.vision-card.selected .card-blob svg {
+  filter: drop-shadow(0 0 0 3px rgba(255,255,255,0.9));
+}
+
+/* Blob SVG shape */
+.card-blob {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(255,255,255,0.22) 0%,
-    rgba(255,255,255,0.05) 50%,
-    rgba(255,255,255,0) 100%
-  );
-  pointer-events: none;
-  border-radius: var(--radius-lg);
+  width: 100%;
+  height: 100%;
+  transform-origin: center;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.08));
+}
+
+.card-blob svg {
+  width: 100%;
+  height: 100%;
+  animation: blob-skew var(--blob-time, 20s) linear infinite;
+  transform-origin: center;
+}
+
+@keyframes blob-skew {
+  0% {
+    transform: scaleX(1) scaleY(1) rotate(0deg);
+  }
+  25% {
+    transform: scaleX(0.96) scaleY(1.04) rotate(3deg);
+  }
+  50% {
+    transform: scaleX(1.04) scaleY(0.96) rotate(0deg);
+  }
+  75% {
+    transform: scaleX(0.98) scaleY(1.02) rotate(-3deg);
+  }
+  100% {
+    transform: scaleX(1) scaleY(1) rotate(0deg);
+  }
+}
+
+.card-inner {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-lg);
 }
 
 .card-header {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   margin-bottom: var(--space-sm);
-  opacity: 0.85;
+  opacity: 0.7;
 }
 
 .type-glyph {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 .type-label {
   font-family: var(--font-mono);
-  font-size: 0.5rem;
+  font-size: 0.45rem;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 .card-content {
@@ -251,7 +279,7 @@ body {
 
 .card-label {
   font-family: var(--font-serif);
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 400;
   line-height: 1.25;
   margin-bottom: 4px;
@@ -259,15 +287,17 @@ body {
 
 .card-description {
   font-family: var(--font-mono);
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   line-height: 1.5;
-  opacity: 0.75;
+  opacity: 0.7;
+  max-width: 140px;
+  margin: 0 auto;
 }
 
 .delete-btn {
   position: absolute;
-  top: -10px;
-  right: -10px;
+  top: 20px;
+  right: 20px;
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -1160,12 +1190,20 @@ body {
   
   .vision-card {
     width: 160px;
-    height: 95px;
-    padding: var(--space-sm) var(--space-md);
+    height: 160px;
+  }
+  
+  .card-inner {
+    padding: var(--space-md);
   }
   
   .card-label {
-    font-size: 1rem;
+    font-size: 0.95rem;
+  }
+  
+  .card-description {
+    font-size: 0.5rem;
+    max-width: 110px;
   }
   
   .toolbar-buttons {

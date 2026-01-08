@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { VisionNode, NodeType } from '../types';
-import { CARD_COLORS } from '../types';
+import { CARD_COLORS, DEFAULT_CARD_COLOR } from '../types';
 
 interface CardDetailViewProps {
   node: VisionNode | null;
@@ -17,7 +17,7 @@ const TYPE_CONFIG: Record<NodeType, {
   rehearsalPrompts: string[];
 }> = {
   state: { 
-    defaultColor: '#FF6B6B',
+    defaultColor: DEFAULT_CARD_COLOR,
     glyph: '◈',
     rehearsalPrompts: [
       'When you embody this state, how do you walk into a room?',
@@ -27,7 +27,7 @@ const TYPE_CONFIG: Record<NodeType, {
     ]
   },
   identity: { 
-    defaultColor: '#4ECDC4',
+    defaultColor: DEFAULT_CARD_COLOR,
     glyph: '◎',
     rehearsalPrompts: [
       'What does this person do on a typical Tuesday?',

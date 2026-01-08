@@ -4,7 +4,7 @@ import type { VisionNode, NodeType } from '../types';
 import { VisionCard } from './VisionCard';
 import { CreateCardModal } from './CreateCardModal';
 import { CardDetailView } from './CardDetailView';
-import { simulatePhysics, getConnectionPath } from '../physics';
+import { simulatePhysics } from '../physics';
 import { v4 as uuidv4 } from 'uuid';
 
 const BOTTOM_PANEL_HEIGHT = 120;
@@ -17,8 +17,6 @@ interface MindGraphProps {
 export function MindGraph({ nodes, setNodes }: MindGraphProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [draggedId, setDraggedId] = useState<string | null>(null);
-  const [connectingFrom, setConnectingFrom] = useState<string | null>(null);
-  const [time, setTime] = useState(0);
   const [dimensions, setDimensions] = useState({ 
     width: window.innerWidth, 
     height: window.innerHeight - BOTTOM_PANEL_HEIGHT 
@@ -48,7 +46,6 @@ export function MindGraph({ nodes, setNodes }: MindGraphProps) {
       const delta = currentTime - lastTime;
       
       if (delta > 16) {
-        setTime(currentTime);
         setNodes(prev => simulatePhysics(prev, dimensions.width, dimensions.height, undefined, draggedId));
         lastTime = currentTime;
       }
@@ -69,7 +66,7 @@ export function MindGraph({ nodes, setNodes }: MindGraphProps) {
   }, []);
 
   const handleDrag = useCallback((id: string, clientX: number, clientY: number) => {
-    const maxY = dimensions.height - 180; // Large bottom padding
+    const maxY = dimensions.height - 180;
     const minY = 120;
     const minX = dimensions.width * 0.18;
     const maxX = dimensions.width * 0.82;
@@ -94,21 +91,8 @@ export function MindGraph({ nodes, setNodes }: MindGraphProps) {
   }, [setNodes]);
 
   const handleSelect = useCallback((id: string) => {
-    if (connectingFrom && connectingFrom !== id) {
-      setNodes(prev => prev.map(node => {
-        if (node.id === connectingFrom && !node.connections.includes(id)) {
-          return { ...node, connections: [...node.connections, id] };
-        }
-        if (node.id === id && !node.connections.includes(connectingFrom)) {
-          return { ...node, connections: [...node.connections, connectingFrom] };
-        }
-        return node;
-      }));
-      setConnectingFrom(null);
-    } else {
-      setSelectedId(prev => prev === id ? null : id);
-    }
-  }, [connectingFrom, setNodes]);
+    setSelectedId(prev => prev === id ? null : id);
+  }, []);
 
   const handleUpdate = useCallback((id: string, updates: Partial<VisionNode>) => {
     setNodes(prev => prev.map(node => 
@@ -116,18 +100,12 @@ export function MindGraph({ nodes, setNodes }: MindGraphProps) {
     ));
   }, [setNodes]);
 
-  const handleConnect = useCallback((fromId: string) => {
-    setConnectingFrom(fromId);
+  const handleConnect = useCallback(() => {
+    // No-op since we removed connections
   }, []);
 
   const handleDelete = useCallback((id: string) => {
-    setNodes(prev => prev
-      .filter(node => node.id !== id)
-      .map(node => ({
-        ...node,
-        connections: node.connections.filter(connId => connId !== id)
-      }))
-    );
+    setNodes(prev => prev.filter(node => node.id !== id));
     setSelectedId(null);
     setDetailNodeId(null);
   }, [setNodes]);
@@ -176,34 +154,7 @@ export function MindGraph({ nodes, setNodes }: MindGraphProps) {
 
   const handleBackgroundClick = useCallback(() => {
     setSelectedId(null);
-    setConnectingFrom(null);
   }, []);
-
-  const connections: React.ReactElement[] = [];
-  const drawnPairs = new Set<string>();
-
-  nodes.forEach(node => {
-    node.connections.forEach(connectedId => {
-      const pairKey = [node.id, connectedId].sort().join('-');
-      if (drawnPairs.has(pairKey)) return;
-      drawnPairs.add(pairKey);
-
-      const connected = nodes.find(n => n.id === connectedId);
-      if (!connected) return;
-
-      const path = getConnectionPath(node, connected, time);
-      const isHighlighted = selectedId === node.id || selectedId === connectedId;
-
-      connections.push(
-        <path
-          key={pairKey}
-          d={path}
-          className={`connection ${isHighlighted ? 'highlighted' : ''}`}
-          strokeWidth={isHighlighted ? 2 : 1.5}
-        />
-      );
-    });
-  });
 
   const detailNode = detailNodeId ? nodes.find(n => n.id === detailNodeId) || null : null;
 
@@ -216,12 +167,6 @@ export function MindGraph({ nodes, setNodes }: MindGraphProps) {
         style={{ height: `calc(100vh - ${BOTTOM_PANEL_HEIGHT}px)` }}
       >
         <div className="graph-grain" />
-        
-        <svg className="connections-layer" width={dimensions.width} height={dimensions.height}>
-          <g>
-            {connections}
-          </g>
-        </svg>
 
         <AnimatePresence>
           {nodes.map(node => (
@@ -241,18 +186,8 @@ export function MindGraph({ nodes, setNodes }: MindGraphProps) {
           ))}
         </AnimatePresence>
 
-        {connectingFrom && (
-          <div className="connect-mode">
-            Click another card to connect
-            <button onClick={() => setConnectingFrom(null)}>Cancel</button>
-          </div>
-        )}
-
-        {selectedId && !connectingFrom && (
+        {selectedId && (
           <div className="selection-actions">
-            <button onClick={() => setConnectingFrom(selectedId)}>
-              Connect
-            </button>
             <button onClick={() => handleOpenDetail(selectedId)}>
               Open
             </button>
